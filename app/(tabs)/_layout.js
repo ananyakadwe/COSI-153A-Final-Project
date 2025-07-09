@@ -1,4 +1,3 @@
-// app/(tabs)/_layout.js
 import { MaterialCommunityIcons } from '@expo/vector-icons'; // Import icons for tab bar
 import { Tabs } from 'expo-router';
 
@@ -11,32 +10,31 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#6A5ACD', // Color for the active tab icon and label
-        tabBarInactiveTintColor: '#888', // Color for inactive tab icons and labels
+        tabBarActiveTintColor: '#6A5ACD', 
+        tabBarInactiveTintColor: '#888', 
         tabBarStyle: {
-          backgroundColor: '#FFF', // White background for the tab bar
-          borderTopWidth: 1, // Thin line at the top of the tab bar
-          borderTopColor: '#EEE', // Light grey border color
-          paddingBottom: 5, // Adds a little padding at the bottom for better visual
-          height: 60, // Sets a fixed height for the tab bar
+          backgroundColor: '#FFF', 
+          borderTopWidth: 1, 
+          borderTopColor: '#EEE', 
+          paddingBottom: 5, 
+          height: 60, 
         },
         headerStyle: {
-          backgroundColor: '#6A5ACD', // Purple background for the header bar of each tab screen
+          backgroundColor: '#6A5ACD', 
         },
-        headerTintColor: '#fff', // White text color for the header title
+        headerTintColor: '#fff', 
         headerTitleStyle: {
-          fontWeight: 'bold', // Bold font for the header title
+          fontWeight: 'bold', 
         },
       }}
     >
       {/* Tab for New Entry Screen (corresponds to app/(tabs)/index.js) */}
       <Tabs.Screen
-        name="index" // The file name without the extension (index.js)
+        name="index" 
         options={{
-          title: 'New Entry', // Title displayed in the header bar of this screen
-          tabBarLabel: 'New Entry', // Label displayed under the tab icon in the tab bar
+          title: 'New Entry', 
+          tabBarLabel: 'New Entry', 
           tabBarIcon: ({ color, size }) => (
-            // Icon for this tab, using MaterialCommunityIcons
             <MaterialCommunityIcons name="pencil-plus" color={color} size={size} />
           ),
         }}
@@ -44,7 +42,7 @@ export default function TabLayout() {
 
       {/* Tab for Mood History Screen (corresponds to app/(tabs)/history.js) */}
       <Tabs.Screen
-        name="history" // The file name without the extension (history.js)
+        name="history" 
         options={{
           title: 'Mood History',
           tabBarLabel: 'History',
@@ -56,7 +54,7 @@ export default function TabLayout() {
 
       {/* Tab for Inspiration Board Screen (corresponds to app/(tabs)/inspiration.js) */}
       <Tabs.Screen
-        name="inspiration" // The file name without the extension (inspiration.js)
+        name="inspiration" 
         options={{
           title: 'Inspiration Board',
           tabBarLabel: 'Inspiration',

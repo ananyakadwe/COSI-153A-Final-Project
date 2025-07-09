@@ -15,22 +15,41 @@ import {
   View,
 } from 'react-native';
 
-const MOOD_ENTRIES_KEY = 'moodEntries'; // Key for AsyncStorage to store mood entries
+/**
+ * Key used for storing and retrieving mood entries in AsyncStorage.
+ * @type {string}
+ */
+const MOOD_ENTRIES_KEY = 'moodEntries';
 
 /**
- * The main screen for adding new mood entries.
- * Users can select a mood, write a journal entry, and take a photo.
- * This is now the 'New Entry' tab.
+ * NewEntryScreen component allows users to log their current mood,
+ * write a journal entry, and optionally attach a photo.
+ * This component serves as the 'New Entry' tab in the application.
+ *
+ * @returns {JSX.Element} The rendered New Entry Screen.
  */
 export default function NewEntryScreen() {
-  // State to store the selected mood (e.g., 'happy', 'sad', 'neutral')
+  /**
+   * State hook to store the currently selected mood.
+   * @type {[string|null, Function]}
+   */
   const [selectedMood, setSelectedMood] = useState(null);
-  // State to store the journal entry text
+  /**
+   * State hook to store the text entered in the journal.
+   * @type {[string, Function]}
+   */
   const [journalText, setJournalText] = useState('');
-  // State to store the URI of the captured image
+  /**
+   * State hook to store the URI of the captured image.
+   * @type {[string|null, Function]}
+   */
   const [imageUri, setImageUri] = useState(null);
 
-  // Define mood options with emojis and colors
+  /**
+   * Array defining available mood options, including their display name,
+   * corresponding emoji, and a color for styling.
+   * @type {Array<Object>}
+   */
   const moodOptions = [
     { mood: 'Happy', emoji: '😊', color: '#8BC34A' },
     { mood: 'Neutral', emoji: '😐', color: '#FFEB3B' },
@@ -42,6 +61,14 @@ export default function NewEntryScreen() {
     { mood: 'Angry', emoji: '😡', color: '#DC143C' },
   ];
 
+  /**
+   * Handles taking a picture using the device's camera.
+   * Requests camera permissions, launches the camera, and if a photo is taken
+   * successfully, sets the `imageUri` state with the URI of the captured image.
+   * Displays alerts for permission denial or if the camera operation is cancelled.
+   *
+   * @returns {Promise<void>} A promise that resolves when the picture is taken or cancelled.
+   */
   const takePicture = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
@@ -61,36 +88,45 @@ export default function NewEntryScreen() {
     }
   };
 
+  /**
+   * Saves the current mood entry to AsyncStorage.
+   * Validates if a mood has been selected. If not, an alert is displayed.
+   * Constructs a new mood entry object with a unique ID and timestamp.
+   * Retrieves existing entries from AsyncStorage, adds the new entry to the beginning,
+   * and saves the updated list back to AsyncStorage.
+   * Resets the form fields (selected mood, journal text, image URI) upon successful save.
+   *
+   * @returns {Promise<void>} A promise that resolves when the mood entry is saved.
+   */
   const saveMoodEntry = async () => {
     if (!selectedMood) {
       Alert.alert('Missing Mood', 'Please select your mood before saving!');
       return;
     }
 
-    // --- MODIFICATION START ---
-    // Get the current date and time
-    const timestampToSave = new Date().toISOString(); // Use the actual current date and time
-    // --- MODIFICATION END ---
+    const timestampToSave = new Date().toISOString();
 
     const newEntry = {
       id: Date.now().toString(),
       mood: selectedMood,
       journalText: journalText,
       imageUri: imageUri,
-      timestamp: timestampToSave, // Use the current date and time
+      timestamp: timestampToSave, 
     };
 
     try {
       const storedEntries = await AsyncStorage.getItem(MOOD_ENTRIES_KEY);
       const currentEntries = storedEntries ? JSON.parse(storedEntries) : [];
+      // Add the new entry at the beginning of the array
       const updatedEntries = [newEntry, ...currentEntries];
       await AsyncStorage.setItem(MOOD_ENTRIES_KEY, JSON.stringify(updatedEntries));
 
       Alert.alert('Success', 'Mood entry saved!');
+      // Reset form fields
       setSelectedMood(null);
       setJournalText('');
       setImageUri(null);
-      Keyboard.dismiss();
+      Keyboard.dismiss(); 
     } catch (error) {
       console.error('Error saving mood entry:', error);
       Alert.alert('Error', 'Failed to save mood entry.');
@@ -99,15 +135,16 @@ export default function NewEntryScreen() {
 
   return (
     <LinearGradient
-      colors={['#E6E6FA', '#D8BFD8']} // Light Lavender to Thistle gradient
+      colors={['#E6E6FA', '#D8BFD8']}
       style={styles.gradientBackground}
     >
+      {/* TouchableWithoutFeedback to dismiss keyboard when tapping outside input fields */}
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           <View style={styles.contentContainer}>
             {/* App Name */}
             <Text style={styles.appName}>MoodSnap</Text>
-            {/* Updated Subtitle */}
+            {/* Subtitle providing a brief description */}
             <Text style={styles.subtitle}>Welcome to MoodSnap! Log your daily feelings and reflections.</Text>
 
             {/* Mood Selection Card */}
@@ -120,7 +157,7 @@ export default function NewEntryScreen() {
                     style={[
                       styles.moodButton,
                       { backgroundColor: option.color },
-                      selectedMood === option.mood && styles.selectedMoodButton,
+                      selectedMood === option.mood && styles.selectedMoodButton, 
                     ]}
                     onPress={() => setSelectedMood(option.mood)}
                   >
@@ -167,6 +204,11 @@ export default function NewEntryScreen() {
   );
 }
 
+/**
+ * StyleSheet for the NewEntryScreen component.
+ * Defines the visual styles for the gradient background, containers, text,
+ * mood selection buttons, text input, camera section, image preview, and save button.
+ */
 const styles = StyleSheet.create({
   gradientBackground: {
     flex: 1,
@@ -180,13 +222,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 15,
   },
-  appName: { // New style for the app name
+  appName: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#6A5ACD', // A purple color that fits the theme
+    color: '#6A5ACD', 
     marginBottom: 5,
     textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+    textShadowColor: 'rgba(0, 0, 0, 0.1)', 
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
@@ -201,7 +243,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 18,
     color: '#666',
-    marginBottom: 20, // Space below subtitle and above the first card
+    marginBottom: 20,
     textAlign: 'center',
   },
   card: {
@@ -246,7 +288,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   selectedMoodButton: {
-    borderColor: '#6A5ACD',
+    borderColor: '#6A5ACD', 
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 6,
@@ -268,12 +310,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     backgroundColor: '#F9F9F9',
-    textAlignVertical: 'top',
+    textAlignVertical: 'top', 
     fontSize: 16,
     color: '#333',
   },
   cameraButton: {
-    backgroundColor: '#6A5ACD',
+    backgroundColor: '#6A5ACD', 
     paddingVertical: 14,
     paddingHorizontal: 30,
     borderRadius: 30,
@@ -283,7 +325,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 6,
-    alignSelf: 'center', // Re-added this line to center the button
+    alignSelf: 'center', 
   },
   cameraButtonText: {
     color: '#FFF',
@@ -300,7 +342,7 @@ const styles = StyleSheet.create({
     borderColor: '#DDD',
   },
   saveButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4CAF50', 
     paddingVertical: 16,
     paddingHorizontal: 40,
     borderRadius: 30,
