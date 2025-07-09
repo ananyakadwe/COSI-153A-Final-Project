@@ -1,4 +1,3 @@
-// app/_layout.js
 import { Stack } from 'expo-router';
 
 /**
