@@ -235,7 +235,7 @@ export default function InspirationBoardScreen() {
 
   return (
     <LinearGradient
-      colors={['#E6E6FA', '#D8BFD8']} // Light Lavender to Thistle gradient
+      colors={['#E6E6FA', '#D8BFD8']} 
       style={styles.gradientBackground}
     >
       <View style={styles.contentContainer}>
