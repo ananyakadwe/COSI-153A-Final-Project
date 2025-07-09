@@ -5,14 +5,12 @@ import {
   StyleSheet,
   FlatList,
   Image,
-  TouchableOpacity,
   Alert,
   ScrollView
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 /**
  * Key used for storing and retrieving mood entries in AsyncStorage.
@@ -23,7 +21,6 @@ const MOOD_ENTRIES_KEY = 'moodEntries';
 /**
  * MoodHistoryScreen component displays a history of user's mood entries.
  * It allows users to view past entries, including their mood, date, journal text, and associated images.
- * Users can also delete individual mood entries from this screen.
  *
  * This component serves as the 'History' tab in the application.
  *
@@ -67,55 +64,14 @@ export default function MoodHistoryScreen() {
   useFocusEffect(
     useCallback(() => {
       loadMoodEntries();
-      // Optional cleanup function if needed
       return () => {};
     }, [loadMoodEntries])
   );
 
   /**
-   * Handles the deletion of a specific mood entry.
-   * Displays an alert to confirm the deletion. If confirmed, the entry is removed from the
-   * `moodEntries` state and the updated list is saved back to AsyncStorage.
-   *
-   * @param {string} idToDelete The unique identifier of the mood entry to be deleted.
-   * @returns {void}
-   */
-  const deleteMoodEntry = (idToDelete) => {
-    Alert.alert(
-      'Delete Mood Entry',
-      'Are you sure you want to delete this mood entry?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          onPress: async () => {
-            try {
-              const updatedEntries = moodEntries.filter(
-                (entry) => entry.id !== idToDelete
-              );
-              setMoodEntries(updatedEntries);
-              await AsyncStorage.setItem(MOOD_ENTRIES_KEY, JSON.stringify(updatedEntries));
-              Alert.alert('Deleted', 'Mood entry removed.');
-            } catch (error) {
-              console.error('Error deleting mood entry:', error);
-              Alert.alert('Error', 'Failed to delete mood entry.');
-            }
-          },
-          style: 'destructive',
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  /**
    * Renders an individual mood entry card for the FlatList.
    * This function formats the date and time, determines the appropriate emoji and color
    * based on the mood, and displays the journal text and image if available.
-   * It also includes a delete button for each entry.
    *
    * @param {Object} props - The props for rendering a list item.
    * @param {Object} props.item - The mood entry object to render.
@@ -165,12 +121,6 @@ export default function MoodHistoryScreen() {
         {item.imageUri && (
           <Image source={{ uri: item.imageUri }} style={styles.entryImage} />
         )}
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => deleteMoodEntry(item.id)}
-        >
-          <MaterialCommunityIcons name="close-circle" size={24} color="#FFF" />
-        </TouchableOpacity>
       </View>
     );
   };
@@ -277,15 +227,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     resizeMode: 'cover',
   },
-  deleteButton: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 15,
-    padding: 5,
-    zIndex: 1,
-  },
+
   emptyStateScrollView: {
     flexGrow: 1,
     justifyContent: 'center',
